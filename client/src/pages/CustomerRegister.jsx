@@ -3,7 +3,7 @@ import { TextField, Button, Container, Typography, Box, Snackbar, Alert } from "
 
 const CustomerRegister = () => {
   const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", password: "", role: "" });
-  const [registrationSuccess, setRegistrationSuccess] = useState(false); // Track successful registration
+  const [registrationSuccess, setRegistrationSuccess] = useState(false); 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -32,7 +32,7 @@ const CustomerRegister = () => {
         setSnackbarMessage("Registration successful! Check your email for verification.");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
-        setRegistrationSuccess(true); // Hide form and show message
+        setRegistrationSuccess(true); 
       } else {
         setSnackbarMessage(result.message || "Registration failed!");
         setSnackbarSeverity("error");

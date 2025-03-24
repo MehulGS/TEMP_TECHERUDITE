@@ -17,11 +17,9 @@ const AdminLogin = () => {
 
     try {
       const res = await axios.post("http://localhost:5000/api/auth/admin/login", { email, password });
-      
-      // Save Token in Local Storage
+
       localStorage.setItem("adminToken", res.data.data.token);
 
-      // Redirect to Admin Dashboard
       navigate("/admin-dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");

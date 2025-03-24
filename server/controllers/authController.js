@@ -70,27 +70,22 @@ exports.adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Find user by email
+
         const user = await User.findOne({ email });
 
-        // If user not found
         if (!user) 
             return responseHandler(res, 400, false, "Invalid admin credentials");
 
-        // Check if user is an admin
         if (user.role !== "admin")
             return responseHandler(res, 403, false, "You are not allowed to login from here");
 
-        // Check if email is verified
         if (!user.isVerified)
             return responseHandler(res, 400, false, "Email not verified");
 
-        // Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) 
             return responseHandler(res, 400, false, "Invalid admin credentials");
 
-        // Generate JWT Token
         const token = jwt.sign(
             {
                 id: user._id,

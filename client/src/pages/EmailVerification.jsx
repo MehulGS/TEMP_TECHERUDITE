@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Container, Typography, CircularProgress, Alert } from "@mui/material";
-import {jwtDecode} from "jwt-decode" // Import jwtDecode
+import {jwtDecode} from "jwt-decode"
 
 const EmailVerification = () => {
-  const { token } = useParams(); // Get token from URL parameter
+  const { token } = useParams(); 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -21,18 +21,15 @@ const EmailVerification = () => {
       }
 
       try {
-        // Decode token to get user role
         const decodedToken = jwtDecode(token);
-        const userRole = decodedToken.role; // Assuming role is stored in the token payload
+        const userRole = decodedToken.role; 
 
-        // Verify email by calling the backend
         const res = await axios.get(
           `http://localhost:5000/api/auth/verify/${token}`
         );
         setMessage(res.data.message);
         setError(false);
 
-        // Navigate based on role
         setTimeout(() => {
           if (userRole === "admin") {
             navigate("/admin-login");
