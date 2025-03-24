@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
         if (user) return responseHandler(res, 400, false, "User already exists");
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, {
+        const verificationToken = jwt.sign({ email,role }, process.env.JWT_SECRET, {
             expiresIn: "1d",
         });
 
@@ -41,46 +41,89 @@ exports.register = async (req, res) => {
 };
 
 // Verify Email
+
 exports.verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
 
-        const user = await User.findOne({
-            emailVerificationToken: token,
-            emailVerificationExpires: { $gt: Date.now() }
-        });
-
-        if (!user) {
-            return res.status(400).json({
-                message: 'Invalid or expired verification token'
-            });
+        if (!token) {
+            console.log("Token not found or invalid.");
+            return res.status(400).json({ message: "Invalid or expired token" });
         }
 
-        user.isEmailVerified = true;
-        user.emailVerificationToken = undefined;
-        user.emailVerificationExpires = undefined;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const user = await User.findOne({ email: decoded.email });
+
+        user.isVerified = true;
         await user.save();
 
-        res.json({ message: 'Email verified successfully' });
+        res.json({ message: "Email successfully verified" });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.log("Error in Verification: ", error);
+        return res.status(400).json({ message: "Invalid or expired token" });
     }
 };
 
-// Login
-exports.login = async (req, res) => {
+//Admin Login
+exports.adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Find user by email
         const user = await User.findOne({ email });
 
-        if (!user) return responseHandler(res, 400, false, "Invalid credentials");
+        // If user not found
+        if (!user) 
+            return responseHandler(res, 400, false, "Invalid admin credentials");
+
+        // Check if user is an admin
+        if (user.role !== "admin")
+            return responseHandler(res, 403, false, "You are not allowed to login from here");
+
+        // Check if email is verified
+        if (!user.isVerified)
+            return responseHandler(res, 400, false, "Email not verified");
+
+        // Compare passwords
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) 
+            return responseHandler(res, 400, false, "Invalid admin credentials");
+
+        // Generate JWT Token
+        const token = jwt.sign(
+            {
+                id: user._id,
+                role: user.role,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        return responseHandler(res, 200, true, "Admin login successful", { token });
+
+    } catch (error) {
+        return responseHandler(res, 500, false, "Server error", error.message);
+    }
+};
+
+// Customer Login
+exports.customerLogin = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findOne({ email, role: "customer" });
+
+        if (!user) return responseHandler(res, 400, false, "Invalid customer credentials");
 
         if (!user.isVerified)
             return responseHandler(res, 400, false, "Email not verified");
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return responseHandler(res, 400, false, "Invalid credentials");
+        if (!isMatch) return responseHandler(res, 400, false, "Invalid customer credentials");
 
         const token = jwt.sign(
             {
@@ -94,22 +137,7 @@ exports.login = async (req, res) => {
             { expiresIn: "1h" }
         );
 
-        return responseHandler(res, 200, true, "Login successful", { token });
-    } catch (error) {
-        return responseHandler(res, 500, false, "Server error", error.message);
-    }
-};
-
-//Get Customer Details
-exports.getCustomerDetails = async (req, res) => {
-    try {
-        const customers = await User.find({ role: "customer" }).select("-password -verificationToken");
-
-        if (!customers || customers.length === 0) {
-            return responseHandler(res, 404, false, "No customers found");
-        }
-
-        return responseHandler(res, 200, true, "Customer details retrieved successfully", customers);
+        return responseHandler(res, 200, true, "Customer login successful", { token });
     } catch (error) {
         return responseHandler(res, 500, false, "Server error", error.message);
     }

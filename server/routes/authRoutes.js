@@ -1,5 +1,5 @@
 const express = require("express");
-const { register, verifyEmail, login, getCustomerDetails } = require("../controllers/authController");
+const { register, verifyEmail, adminLogin, customerLogin } = require("../controllers/authController");
 const { check } = require("express-validator");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -13,8 +13,8 @@ router.post(
   ],
   register
 );
-router.get("/customers", authMiddleware, getCustomerDetails);
 router.get("/verify/:token", verifyEmail);
-router.post("/login", login);
+router.post("/admin/login", adminLogin);
+router.post("/customer/login", customerLogin);
 
 module.exports = router;
