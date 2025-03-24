@@ -42,23 +42,28 @@ exports.register = async (req, res) => {
 
 // Verify Email
 exports.verifyEmail = async (req, res) => {
-    const { token } = req.query;
-
     try {
-        if (!token) return responseHandler(res, 400, false, "Missing verification token");
+        const { token } = req.params;
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findOneAndUpdate(
-            { email: decoded.email },
-            { isVerified: true, verificationToken: null },
-            { new: true }
-        );
+        const user = await User.findOne({
+            emailVerificationToken: token,
+            emailVerificationExpires: { $gt: Date.now() }
+        });
 
-        if (!user) return responseHandler(res, 400, false, "Invalid token or user not found");
+        if (!user) {
+            return res.status(400).json({
+                message: 'Invalid or expired verification token'
+            });
+        }
 
-        return responseHandler(res, 200, true, "Email verified successfully! You can now log in.");
+        user.isEmailVerified = true;
+        user.emailVerificationToken = undefined;
+        user.emailVerificationExpires = undefined;
+        await user.save();
+
+        res.json({ message: 'Email verified successfully' });
     } catch (error) {
-        return responseHandler(res, 500, false, "Invalid or expired token", error.message);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
