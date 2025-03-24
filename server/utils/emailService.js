@@ -50,5 +50,4 @@ const sendVerificationEmail = async (to, token) => {
     }
 };
 
-// ✅ Correctly export the function
 module.exports = { sendVerificationEmail };

@@ -62,14 +62,11 @@ exports.verifyEmail = async (req, res) => {
     }
 };
 
-
-
 // Login
 exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Find user by email
         const user = await User.findOne({ email });
 
         if (!user) return responseHandler(res, 400, false, "Invalid credentials");
@@ -77,11 +74,9 @@ exports.login = async (req, res) => {
         if (!user.isVerified)
             return responseHandler(res, 400, false, "Email not verified");
 
-        // Check password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return responseHandler(res, 400, false, "Invalid credentials");
 
-        // Create JWT token with user details
         const token = jwt.sign(
             {
                 id: user._id,
@@ -95,6 +90,21 @@ exports.login = async (req, res) => {
         );
 
         return responseHandler(res, 200, true, "Login successful", { token });
+    } catch (error) {
+        return responseHandler(res, 500, false, "Server error", error.message);
+    }
+};
+
+//Get Customer Details
+exports.getCustomerDetails = async (req, res) => {
+    try {
+        const customers = await User.find({ role: "customer" }).select("-password -verificationToken");
+
+        if (!customers || customers.length === 0) {
+            return responseHandler(res, 404, false, "No customers found");
+        }
+
+        return responseHandler(res, 200, true, "Customer details retrieved successfully", customers);
     } catch (error) {
         return responseHandler(res, 500, false, "Server error", error.message);
     }
