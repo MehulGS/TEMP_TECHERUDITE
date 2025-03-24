@@ -86,6 +86,15 @@ const CustomerLogin = () => {
             {loading ? <CircularProgress size={24} /> : "Login"}
           </Button>
         </Box>
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          Don't have an account?{" "}
+          <Button
+            onClick={() => navigate("/customer-register")}
+            sx={{ textTransform: "none" }}
+          >
+            Customer Register
+          </Button>
+        </Typography>
       </Container>
     </>
   );

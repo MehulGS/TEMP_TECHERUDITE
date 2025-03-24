@@ -14,6 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
+    <>
     <Router>
       <CssBaseline />
       <Container maxWidth="sm">
@@ -39,6 +40,7 @@ function App() {
         </Routes>
       </Container>
     </Router>
+    </>
   );
 }
 

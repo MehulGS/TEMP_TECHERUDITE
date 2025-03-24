@@ -14,13 +14,11 @@ const Landing = () => {
         <Typography variant="h6" color="textSecondary">
           Manage your tasks efficiently with our secure and powerful system.
         </Typography>
-        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={() => navigate("/admin-login")}>
-            Admin Login
-          </Button>
-          <Button variant="contained" color="secondary" onClick={() => navigate("/customer-login")}>
-            Customer Login
-          </Button>
+        <Box sx={{ display: "flex", gap: 2, mt: 2, flexWrap: "wrap", justifyContent: "center" }}>
+          <Button variant="contained" color="primary" onClick={() => navigate("/admin-login")}>Admin Login</Button>
+          <Button variant="contained" color="secondary" onClick={() => navigate("/customer-login")}>Customer Login</Button>
+          <Button variant="outlined" color="primary" onClick={() => navigate("/admin-register")}>Admin Registration</Button>
+          <Button variant="outlined" color="secondary" onClick={() => navigate("/customer-register")}>Customer Registration</Button>
         </Box>
       </Box>
     </Container>

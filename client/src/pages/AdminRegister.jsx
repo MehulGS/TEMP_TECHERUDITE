@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, Container, Typography, Box, Snackbar, Alert } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Box,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const AdminRegister = () => {
-  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", password: "", role: "" });
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    role: "",
+  });
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -27,12 +43,14 @@ const AdminRegister = () => {
         body: JSON.stringify(formData),
       });
       const result = await response.json();
-  
+
       if (response.ok) {
-        setSnackbarMessage("Registration successful! Check your email for verification.");
+        setSnackbarMessage(
+          "Registration successful! Check your email for verification."
+        );
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
-        setRegistrationSuccess(true); 
+        setRegistrationSuccess(true);
       } else {
         setSnackbarMessage(result.message || "Registration failed!");
         setSnackbarSeverity("error");
@@ -45,7 +63,7 @@ const AdminRegister = () => {
       console.log(error);
     }
   };
-  
+
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 5, textAlign: "center" }}>
@@ -55,18 +73,64 @@ const AdminRegister = () => {
           </Typography>
         ) : (
           <>
-            <Typography variant="h4" gutterBottom>Admin Registration</Typography>
+            <Typography variant="h4" gutterBottom>
+              Admin Registration
+            </Typography>
             <form onSubmit={handleSubmit}>
-              <TextField fullWidth label="First Name" name="firstName" margin="normal" required onChange={handleChange} />
-              <TextField fullWidth label="Last Name" name="lastName" margin="normal" required onChange={handleChange} />
-              <TextField fullWidth label="Email" name="email" type="email" margin="normal" required onChange={handleChange} />
-              <TextField fullWidth label="Password" name="password" type="password" margin="normal" required onChange={handleChange} />
-              <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>Register</Button>
+              <TextField
+                fullWidth
+                label="First Name"
+                name="firstName"
+                margin="normal"
+                required
+                onChange={handleChange}
+              />
+              <TextField
+                fullWidth
+                label="Last Name"
+                name="lastName"
+                margin="normal"
+                required
+                onChange={handleChange}
+              />
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                type="email"
+                margin="normal"
+                required
+                onChange={handleChange}
+              />
+              <TextField
+                fullWidth
+                label="Password"
+                name="password"
+                type="password"
+                margin="normal"
+                required
+                onChange={handleChange}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                sx={{ mt: 2 }}
+              >
+                Register
+              </Button>
             </form>
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Already have an account? <Button onClick={() => navigate("/admin-login")} sx={{ textTransform: "none" }}>Admin Login</Button>
+            </Typography>
           </>
         )}
       </Box>
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+      >
         <Alert severity={snackbarSeverity}>{snackbarMessage}</Alert>
       </Snackbar>
     </Container>
