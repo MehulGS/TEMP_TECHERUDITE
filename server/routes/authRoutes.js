@@ -15,6 +15,6 @@ router.post(
 );
 router.get("/customers", authMiddleware, getCustomerDetails);
 router.get("/verify/:token", verifyEmail);
-router.post("/admin/login", login);
+router.post("/login", login);
 
 module.exports = router;
