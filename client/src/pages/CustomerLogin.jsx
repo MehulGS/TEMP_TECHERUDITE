@@ -28,7 +28,7 @@ const CustomerLogin = () => {
         "http://localhost:5000/api/auth/customer/login",
         { email, password }
       );
-
+      localStorage.clear();
       localStorage.setItem("customerToken", res.data.data.token);
 
       navigate("/customer-dashboard");

@@ -28,7 +28,7 @@ const AdminLogin = () => {
         "http://localhost:5000/api/auth/admin/login",
         { email, password }
       );
-
+      localStorage.clear();
       localStorage.setItem("adminToken", res.data.data.token);
 
       navigate("/admin-dashboard");
