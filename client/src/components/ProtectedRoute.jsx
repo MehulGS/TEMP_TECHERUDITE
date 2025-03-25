@@ -1,19 +1,29 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const ProtectedRoute = ({ element, allowedRoles }) => {
-  const token = localStorage.getItem("token"); 
-  const userRole = localStorage.getItem("role");
+  let token = localStorage.getItem("adminToken") || localStorage.getItem("customerToken");
 
   if (!token) {
-    return <Navigate to={allowedRoles.includes("admin") ? "/admin-login" : "/customer-login"} replace />;
+    return <Navigate to="/customer-login" replace />;
   }
 
-  if (!allowedRoles.includes(userRole)) {
-    return <Navigate to={userRole === "admin" ? "/admin-dashboard" : "/customer-dashboard"} replace />;
-  }
+  try {
+    const decodedToken = jwtDecode(token);
+    const userRole = decodedToken.role;
 
-  return element; 
+    if (!allowedRoles.includes(userRole)) {
+      return <Navigate to={userRole === "admin" ? "/admin-dashboard" : "/customer-dashboard"} replace />;
+    }
+
+    return element;
+  } catch (error) {
+    console.error("Invalid token:", error);
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("customerToken");
+    return <Navigate to="/customer-login" replace />;
+  }
 };
 
 export default ProtectedRoute;
